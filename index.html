@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Breathing Dots</title>
+    <style>
+      :root {
+        --dot-color: #1d1f24;
+        --bg-color: #f7f7f7;
+        --panel-bg: rgba(255, 255, 255, 0.82);
+        --panel-border: rgba(29, 31, 36, 0.12);
+        --text-color: #1d1f24;
+        --muted-color: #6f737b;
+        --min-scale: 0;
+        --max-scale: 1;
+        --duration: 4.8s;
+        --metatron-circle-size: 26%;
+        --metatron-center: 50%;
+        --metatron-outer-left: 27.48%;
+        --metatron-outer-right: 72.52%;
+        --metatron-outer-top: 21.92%;
+        --metatron-outer-upper: 35.96%;
+        --metatron-outer-lower: 64.04%;
+        --metatron-outer-bottom: 78.08%;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: var(--bg-color);
+        color: var(--text-color);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .stage {
+        width: min(100%, 1120px);
+        min-height: calc(100vh - 48px);
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) auto;
+        gap: 20px;
+      }
+
+      .breathing-logo {
+        position: relative;
+        align-self: center;
+        justify-self: center;
+        width: min(82vw, 70vh, 760px);
+        aspect-ratio: 1.08;
+      }
+
+      .dot {
+        position: absolute;
+        width: var(--size);
+        aspect-ratio: 1;
+        left: var(--x);
+        top: var(--y);
+        border-radius: 50%;
+        background: var(--dot-color);
+        transform: translate(-50%, -50%) scale(1);
+        transform-origin: center;
+        animation: breathe var(--duration) ease-in-out infinite;
+        animation-delay: var(--delay, 0s);
+        will-change: transform;
+      }
+
+      .is-paused .dot {
+        animation-play-state: paused;
+      }
+
+      .is-center-static .dot-center {
+        animation: none;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .dot-center {
+        --size: var(--metatron-circle-size);
+        --x: var(--metatron-center);
+        --y: var(--metatron-center);
+        --delay: 0s;
+      }
+
+      .dot-top {
+        --size: var(--metatron-circle-size);
+        --x: var(--metatron-center);
+        --y: var(--metatron-outer-top);
+        --delay: -0.7s;
+      }
+
+      .dot-top-right {
+        --size: var(--metatron-circle-size);
+        --x: var(--metatron-outer-right);
+        --y: var(--metatron-outer-upper);
+        --delay: -2.1s;
+      }
+
+      .dot-top-left {
+        --size: var(--metatron-circle-size);
+        --x: var(--metatron-outer-left);
+        --y: var(--metatron-outer-upper);
+        --delay: -2.4s;
+      }
+
+      .dot-bottom {
+        --size: var(--metatron-circle-size);
+        --x: var(--metatron-center);
+        --y: var(--metatron-outer-bottom);
+        --delay: -2.7s;
+      }
+
+      .dot-bottom-left {
+        --size: var(--metatron-circle-size);
+        --x: var(--metatron-outer-left);
+        --y: var(--metatron-outer-lower);
+        --delay: -3.5s;
+      }
+
+      .dot-bottom-right {
+        --size: var(--metatron-circle-size);
+        --x: var(--metatron-outer-right);
+        --y: var(--metatron-outer-lower);
+        --delay: -3.2s;
+      }
+
+      @keyframes breathe {
+        0%,
+        100% {
+          transform: translate(-50%, -50%) scale(var(--min-scale));
+        }
+
+        50% {
+          transform: translate(-50%, -50%) scale(var(--max-scale));
+        }
+      }
+
+      .controls {
+        display: grid;
+        gap: 16px;
+        padding: 18px;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: var(--panel-bg);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 20px 60px rgba(29, 31, 36, 0.08);
+      }
+
+      .mode-list {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .mode-button {
+        min-height: 40px;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--text-color);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .mode-button.is-active {
+        background: var(--dot-color);
+        color: #ffffff;
+      }
+
+      .sliders {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .control {
+        display: grid;
+        gap: 8px;
+      }
+
+      .control-label {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--muted-color);
+      }
+
+      .control-value {
+        color: var(--text-color);
+        font-variant-numeric: tabular-nums;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--dot-color);
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .action-button {
+        min-height: 40px;
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--text-color);
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .action-button:disabled {
+        cursor: progress;
+        opacity: 0.62;
+      }
+
+      .status {
+        min-height: 18px;
+        color: var(--muted-color);
+        font-size: 13px;
+      }
+
+      .status a {
+        color: var(--text-color);
+        font-weight: 700;
+      }
+
+      .status-links {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      @media (max-width: 760px) {
+        body {
+          padding: 16px;
+        }
+
+        .stage {
+          min-height: calc(100vh - 32px);
+        }
+
+        .breathing-logo {
+          width: min(92vw, 58vh);
+        }
+
+        .mode-list,
+        .sliders,
+        .actions {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .dot {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <section class="breathing-logo" aria-label="Анимированные круги">
+        <span class="dot dot-top-left" data-row="0" data-col="0"></span>
+        <span class="dot dot-top" data-row="0" data-col="1"></span>
+        <span class="dot dot-top-right" data-row="0" data-col="2"></span>
+        <span class="dot dot-center" data-row="1" data-col="1"></span>
+        <span class="dot dot-bottom-left" data-row="2" data-col="0"></span>
+        <span class="dot dot-bottom" data-row="2" data-col="1"></span>
+        <span class="dot dot-bottom-right" data-row="2" data-col="2"></span>
+      </section>
+
+      <section class="controls" aria-label="Настройки анимации">
+        <div class="mode-list" role="group" aria-label="Тип динамики">
+          <button class="mode-button is-active" type="button" data-mode="calm">Спокойно</button>
+          <button class="mode-button" type="button" data-mode="wave">Волна</button>
+          <button class="mode-button" type="button" data-mode="chaos">Хаос</button>
+          <button class="mode-button" type="button" data-mode="sync">Синхронно</button>
+          <button class="mode-button" type="button" data-mode="spiral">Спираль</button>
+        </div>
+
+        <div class="sliders">
+          <label class="control">
+            <span class="control-label">
+              <span>Скорость</span>
+              <span class="control-value" data-value-for="speed">4.8s</span>
+            </span>
+            <input id="speed" type="range" min="1.2" max="8" step="0.1" value="4.8">
+          </label>
+
+          <label class="control">
+            <span class="control-label">
+              <span>Минимум</span>
+              <span class="control-value" data-value-for="minScale">0</span>
+            </span>
+            <input id="minScale" type="range" min="0" max="0.8" step="0.05" value="0">
+          </label>
+
+          <label class="control">
+            <span class="control-label">
+              <span>Максимум</span>
+              <span class="control-value" data-value-for="maxScale">1.0</span>
+            </span>
+            <input id="maxScale" type="range" min="0.4" max="1" step="0.05" value="1">
+          </label>
+
+          <label class="control">
+            <span class="control-label">
+              <span>Разброс</span>
+              <span class="control-value" data-value-for="spread">1.0</span>
+            </span>
+            <input id="spread" type="range" min="0" max="2" step="0.1" value="1">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="action-button" type="button" id="pauseButton">Пауза</button>
+          <button class="action-button" type="button" id="centerStaticButton">Центр статичен</button>
+          <button class="action-button" type="button" id="svgButton">Экспорт SVG</button>
+          <button class="action-button" type="button" id="staticSvgButton">Кадр SVG</button>
+          <button class="action-button" type="button" id="mp4Button">Экспорт MP4</button>
+        </div>
+
+        <div class="status" role="status" aria-live="polite" id="status"></div>
+      </section>
+    </main>
+
+    <script>
+      const root = document.documentElement;
+      const dots = Array.from(document.querySelectorAll(".dot"));
+      const buttons = Array.from(document.querySelectorAll(".mode-button"));
+      const logo = document.querySelector(".breathing-logo");
+      const pauseButton = document.querySelector("#pauseButton");
+      const centerStaticButton = document.querySelector("#centerStaticButton");
+      const svgButton = document.querySelector("#svgButton");
+      const staticSvgButton = document.querySelector("#staticSvgButton");
+      const mp4Button = document.querySelector("#mp4Button");
+      const status = document.querySelector("#status");
+      const controls = {
+        speed: document.querySelector("#speed"),
+        minScale: document.querySelector("#minScale"),
+        maxScale: document.querySelector("#maxScale"),
+        spread: document.querySelector("#spread")
+      };
+      const values = {
+        speed: document.querySelector('[data-value-for="speed"]'),
+        minScale: document.querySelector('[data-value-for="minScale"]'),
+        maxScale: document.querySelector('[data-value-for="maxScale"]'),
+        spread: document.querySelector('[data-value-for="spread"]')
+      };
+      const calmDelays = [-2.4, -0.7, -2.1, 0, -3.5, -2.7, -3.2];
+      const chaosDelays = [-0.9, -3.8, -1.6, -0.2, -1.1, -3.2, -0.6];
+      let activeMode = "calm";
+      let isPaused = false;
+      let isCenterStatic = false;
+
+      function delayFor(dot, index) {
+        const row = Number(dot.dataset.row);
+        const col = Number(dot.dataset.col);
+
+        if (activeMode === "sync") return 0;
+        if (activeMode === "wave") return -(row + col) * 0.42;
+        if (activeMode === "spiral") {
+          const spiral = [0, 1, 2, 6, 5, 4, 3];
+          return -spiral.indexOf(index) * 0.28;
+        }
+        if (activeMode === "chaos") return chaosDelays[index];
+        return calmDelays[index];
+      }
+
+      function currentSettings() {
+        let minScale = Number(controls.minScale.value);
+        let maxScale = Number(controls.maxScale.value);
+        const speed = Number(controls.speed.value);
+        const spread = Number(controls.spread.value);
+
+        if (minScale >= maxScale) {
+          minScale = Math.max(0, maxScale - 0.05);
+          controls.minScale.value = minScale.toFixed(2);
+        }
+
+        return { minScale, maxScale, speed, spread };
+      }
+
+      function updateAnimation() {
+        const { minScale, maxScale, speed, spread } = currentSettings();
+
+        root.style.setProperty("--duration", `${speed}s`);
+        root.style.setProperty("--min-scale", minScale);
+        root.style.setProperty("--max-scale", maxScale);
+
+        dots.forEach((dot, index) => {
+          dot.style.setProperty("--delay", `${delayFor(dot, index) * spread}s`);
+        });
+
+        values.speed.textContent = `${speed.toFixed(1)}s`;
+        values.minScale.textContent = minScale.toFixed(2).replace(/0$/, "");
+        values.maxScale.textContent = maxScale.toFixed(2).replace(/0$/, "");
+        values.spread.textContent = spread.toFixed(1);
+      }
+
+      function setStatus(message) {
+        status.textContent = message;
+      }
+
+      function downloadBlob(blob, fileName) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        link.textContent = `Скачать ${fileName}`;
+        link.target = "_blank";
+        document.body.append(link);
+        link.click();
+        link.remove();
+        status.textContent = "";
+        status.append("Файл готов: ");
+        status.append(link);
+      }
+
+      function showSvgLinks(svg, fileName = "breathing-dots.svg") {
+        const encodedSvg = encodeURIComponent(svg)
+          .replace(/'/g, "%27")
+          .replace(/"/g, "%22");
+        const dataUrl = `data:image/svg+xml;charset=utf-8,${encodedSvg}`;
+        const downloadLink = document.createElement("a");
+        const openLink = document.createElement("a");
+        const links = document.createElement("span");
+
+        downloadLink.href = dataUrl;
+        downloadLink.download = fileName;
+        downloadLink.textContent = "Скачать SVG";
+        downloadLink.target = "_blank";
+
+        openLink.href = dataUrl;
+        openLink.textContent = "Открыть SVG";
+        openLink.target = "_blank";
+        openLink.rel = "noopener";
+
+        links.className = "status-links";
+        links.append(downloadLink, openLink);
+
+        status.textContent = "";
+        status.append("Файл готов: ");
+        status.append(links);
+        downloadLink.click();
+      }
+
+      function currentDotScale(dot) {
+        const transform = getComputedStyle(dot).transform;
+
+        if (transform === "none") return 1;
+
+        const values = transform.match(/matrix\(([^)]+)\)/);
+        if (!values) return 1;
+
+        const parts = values[1].split(",").map(Number);
+        const scaleX = parts[0];
+        const skewY = parts[1];
+
+        return Math.hypot(scaleX, skewY);
+      }
+
+      function dotData() {
+        const { spread } = currentSettings();
+        return dots.map((dot, index) => ({
+          x: Number(dot.style.getPropertyValue("--x") || getComputedStyle(dot).getPropertyValue("--x").replace("%", "")),
+          y: Number(dot.style.getPropertyValue("--y") || getComputedStyle(dot).getPropertyValue("--y").replace("%", "")),
+          size: Number(getComputedStyle(dot).getPropertyValue("--size").replace("%", "")),
+          delay: delayFor(dot, index) * spread,
+          isCenter: dot.classList.contains("dot-center")
+        }));
+      }
+
+      function exportSvg() {
+        const { minScale, maxScale, speed } = currentSettings();
+        const width = 1080;
+        const height = 1000;
+        const fill = getComputedStyle(root).getPropertyValue("--dot-color").trim();
+        const bg = getComputedStyle(root).getPropertyValue("--bg-color").trim();
+        const circles = dotData().map((dot, index) => {
+          const cx = (dot.x / 100) * width;
+          const cy = (dot.y / 100) * height;
+          const radius = (dot.size / 100) * width * 0.5;
+          const delay = dot.delay.toFixed(2);
+
+          if (isCenterStatic && dot.isCenter) {
+            return `<circle class="dot dot-${index}" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${radius.toFixed(2)}"/>`;
+          }
+
+          return `<circle class="dot dot-${index}" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${radius.toFixed(2)}"><animate attributeName="r" values="${(radius * minScale).toFixed(2)};${(radius * maxScale).toFixed(2)};${(radius * minScale).toFixed(2)}" dur="${speed}s" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/></circle>`;
+        }).join("");
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${bg}"/><g fill="${fill}">${circles}</g></svg>`;
+
+        showSvgLinks(svg);
+      }
+
+      function exportStaticSvg() {
+        const width = 1080;
+        const height = 1000;
+        const fill = getComputedStyle(root).getPropertyValue("--dot-color").trim();
+        const bg = getComputedStyle(root).getPropertyValue("--bg-color").trim();
+        const circles = dotData().map((dot, index) => {
+          const sourceDot = dots[index];
+          const cx = (dot.x / 100) * width;
+          const cy = (dot.y / 100) * height;
+          const radius = (dot.size / 100) * width * 0.5;
+          const scale = isCenterStatic && dot.isCenter ? 1 : currentDotScale(sourceDot);
+
+          return `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${(radius * scale).toFixed(2)}"/>`;
+        }).join("");
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${bg}"/><g fill="${fill}">${circles}</g></svg>`;
+
+        showSvgLinks(svg, "breathing-dots-frame.svg");
+      }
+
+      function scaleAt(time, duration, delay, minScale, maxScale) {
+        const shifted = ((time - delay) % duration + duration) % duration;
+        const phase = shifted / duration;
+        const wave = 0.5 - 0.5 * Math.cos(phase * Math.PI * 2);
+
+        return minScale + (maxScale - minScale) * wave;
+      }
+
+      function drawFrame(context, width, height, time) {
+        const { minScale, maxScale, speed } = currentSettings();
+        const fill = getComputedStyle(root).getPropertyValue("--dot-color").trim();
+        const bg = getComputedStyle(root).getPropertyValue("--bg-color").trim();
+
+        context.fillStyle = bg;
+        context.fillRect(0, 0, width, height);
+        context.fillStyle = fill;
+
+        dotData().forEach((dot) => {
+          const x = (dot.x / 100) * width;
+          const y = (dot.y / 100) * height;
+          const radius = (dot.size / 100) * width * 0.5;
+          const scale = isCenterStatic && dot.isCenter
+            ? 1
+            : scaleAt(time, speed, dot.delay, minScale, maxScale);
+
+          context.beginPath();
+          context.arc(x, y, radius * scale, 0, Math.PI * 2);
+          context.fill();
+        });
+      }
+
+      async function exportMp4() {
+        if (typeof MediaRecorder === "undefined") {
+          setStatus("Этот браузер не поддерживает экспорт видео");
+          return;
+        }
+
+        const mimeType = [
+          "video/mp4;codecs=avc1.42E01E",
+          "video/mp4",
+          "video/webm;codecs=vp9",
+          "video/webm"
+        ].find((type) => MediaRecorder.isTypeSupported(type));
+
+        if (!mimeType) {
+          setStatus("Этот браузер не поддерживает экспорт видео");
+          return;
+        }
+
+        const { speed } = currentSettings();
+        const width = 1080;
+        const height = 1000;
+        const fps = 60;
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        const chunks = [];
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const stream = canvas.captureStream(fps);
+        const recorder = new MediaRecorder(stream, {
+          mimeType,
+          videoBitsPerSecond: 8000000
+        });
+        const finished = new Promise((resolve) => {
+          recorder.addEventListener("dataavailable", (event) => {
+            if (event.data.size > 0) chunks.push(event.data);
+          });
+          recorder.addEventListener("stop", resolve, { once: true });
+        });
+
+        mp4Button.disabled = true;
+        const isMp4 = mimeType.includes("mp4");
+        setStatus(isMp4 ? "Записываю MP4..." : "MP4 не поддержан, записываю WebM...");
+        recorder.start();
+
+        const totalFrames = Math.ceil(speed * fps);
+        for (let frame = 0; frame <= totalFrames; frame += 1) {
+          drawFrame(context, width, height, frame / fps);
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+        }
+
+        recorder.stop();
+        await finished;
+        stream.getTracks().forEach((track) => track.stop());
+
+        downloadBlob(new Blob(chunks, { type: mimeType }), isMp4 ? "breathing-dots.mp4" : "breathing-dots.webm");
+        mp4Button.disabled = false;
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeMode = button.dataset.mode;
+          buttons.forEach((item) => item.classList.toggle("is-active", item === button));
+          updateAnimation();
+        });
+      });
+
+      pauseButton.addEventListener("click", () => {
+        isPaused = !isPaused;
+        logo.classList.toggle("is-paused", isPaused);
+        pauseButton.textContent = isPaused ? "Продолжить" : "Пауза";
+        setStatus(isPaused ? "Анимация на паузе" : "");
+      });
+
+      centerStaticButton.addEventListener("click", () => {
+        isCenterStatic = !isCenterStatic;
+        logo.classList.toggle("is-center-static", isCenterStatic);
+        centerStaticButton.textContent = isCenterStatic ? "Центр дышит" : "Центр статичен";
+        setStatus(isCenterStatic ? "Центральный круг статичен" : "");
+      });
+
+      svgButton.addEventListener("click", exportSvg);
+      staticSvgButton.addEventListener("click", exportStaticSvg);
+      mp4Button.addEventListener("click", exportMp4);
+
+      Object.values(controls).forEach((control) => {
+        control.addEventListener("input", updateAnimation);
+      });
+
+      updateAnimation();
+    </script>
+  </body>
+</html>
