@@ -15,7 +15,8 @@
         --min-scale: 0;
         --max-scale: 1;
         --duration: 4.8s;
-        --metatron-circle-size: 26%;
+        --metatron-center-circle-size: 26%;
+        --metatron-outer-circle-size: 20.8%;
         --metatron-center: 50%;
         --metatron-outer-left: 27.48%;
         --metatron-outer-right: 72.52%;
@@ -82,49 +83,49 @@
       }
 
       .dot-center {
-        --size: var(--metatron-circle-size);
+        --size: var(--metatron-center-circle-size);
         --x: var(--metatron-center);
         --y: var(--metatron-center);
         --delay: 0s;
       }
 
       .dot-top {
-        --size: var(--metatron-circle-size);
+        --size: var(--metatron-outer-circle-size);
         --x: var(--metatron-center);
         --y: var(--metatron-outer-top);
         --delay: -0.7s;
       }
 
       .dot-top-right {
-        --size: var(--metatron-circle-size);
+        --size: var(--metatron-outer-circle-size);
         --x: var(--metatron-outer-right);
         --y: var(--metatron-outer-upper);
         --delay: -2.1s;
       }
 
       .dot-top-left {
-        --size: var(--metatron-circle-size);
+        --size: var(--metatron-outer-circle-size);
         --x: var(--metatron-outer-left);
         --y: var(--metatron-outer-upper);
         --delay: -2.4s;
       }
 
       .dot-bottom {
-        --size: var(--metatron-circle-size);
+        --size: var(--metatron-outer-circle-size);
         --x: var(--metatron-center);
         --y: var(--metatron-outer-bottom);
         --delay: -2.7s;
       }
 
       .dot-bottom-left {
-        --size: var(--metatron-circle-size);
+        --size: var(--metatron-outer-circle-size);
         --x: var(--metatron-outer-left);
         --y: var(--metatron-outer-lower);
         --delay: -3.5s;
       }
 
       .dot-bottom-right {
-        --size: var(--metatron-circle-size);
+        --size: var(--metatron-outer-circle-size);
         --x: var(--metatron-outer-right);
         --y: var(--metatron-outer-lower);
         --delay: -3.2s;
